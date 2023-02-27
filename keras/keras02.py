@@ -17,3 +17,5 @@ model.add(Dense(1, input_dim = 1))
 #3. 컴파일, 훈련
 model.compile(loss = 'mse', optimizer = 'adam')
 model.fit(x, y, epochs = 30)    # loss가 0이 나와야 가장 좋은값
+
+#4. git test
