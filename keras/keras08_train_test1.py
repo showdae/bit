@@ -19,7 +19,7 @@ y_train = np.array([1,2,3,4,5,6,7])     # y 훈련 데이타 선언
 x_test = np.array([8,9,10])             # x 평가 데이타 선언
 y_test = np.array([8,9,10])             # y 평가 데이타 선언
 
-#2. 모델
+#2. 모델 (행무시, 열우선)
 model = Sequential()
 model.add(Dense(5, input_dim = 1))
 model.add(Dense(7))
