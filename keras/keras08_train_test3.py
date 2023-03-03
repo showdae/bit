@@ -21,10 +21,10 @@ x_train, x_test, y_train, y_test = train_test_split(    # 4개 변수 선언, x,
     random_state = 123                                  # 랜덤 시프 set
 )
 
-print('x_train: ', x_train)
-print('x_test: ', x_test)
-print('y_train: ', y_train)
-print('y_test: ', y_test)
+print("x_train: ", x_train)
+print("x_test: ", x_test)
+print("y_train: ", y_train)
+print("y_test: ", y_test)
 
 #2. 모델
 model = Sequential()                                    # 순차적 모델
@@ -38,12 +38,12 @@ model.add(Dense(5))
 model.add(Dense(1))                                     # out layer: output = 1
 
 #3. 컴파일/훈련
-model.compile(loss='mse', optimizer = 'adam')           # 컴파일, mse: 절대값
+model.compile(loss="mse", optimizer = "adam")           # 컴파일, mse: 절대값
 model.fit(x_train, y_train, epochs=100, batch_size=5)   # 훈련, batch_size: 한번 학습할때 데이타의 수
 
 #4. 평가/예측
 loss = model.evaluate(x_test, y_test)                   # 훈련되지 않은 데이타의 평가
-print('평가', loss)
+print("평가[test 데이타: ]", loss)
 
 result = model.predict([11])                            # 임의의 값 [11] 예측
-print('예측', result)
+print("예측[임의의값 11: ]", result)
