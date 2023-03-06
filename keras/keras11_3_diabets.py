@@ -4,11 +4,11 @@
 # R2 0.62 이상
 # train 0.7 ~ 0.9
 
+from sklearn.model_selection import train_test_split
 from sklearn.datasets import load_diabetes
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
 import numpy as np
-from sklearn.model_selection import train_test_split
 
 #1. 데이터
 datasets = load_diabetes()
@@ -42,8 +42,8 @@ model.add(Dense(5))
 model.add(Dense(1))
 
 #3. 컴파일
-model.compile(loss = "mae", optimizer = "adam")
-model.fit(x_train, y_train, epochs = 50, batch_size = 5)
+model.compile(loss = "mse", optimizer = "adam")
+model.fit(x_train, y_train, epochs = 150, batch_size = 5)
 
 #4. 평가, 예측
 loss = model.evaluate(x_test, y_test)
@@ -54,4 +54,4 @@ y_predict = model.predict(x_test)       # x_test: 예측 input 값
 from sklearn.metrics import r2_score
 r2 = r2_score(y_test, y_predict)        # 예측 값이, 실제 목적 변수의 값과 어느정도 일지하는가를 표시하는 지표 (절대), "1"에 가까운 수록 좋다
                                         # 보조 지표
-print("r2_score : ", r2)                # 음수가 나올경우 값이 아주 안좋다 [ r2_score :  0.4581988927594438 ]
+print("r2_score : ", r2)                # 음수가 나올경우 값이 아주 안좋다 [r2_score :  0.5671414282825895]

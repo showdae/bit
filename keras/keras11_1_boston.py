@@ -26,7 +26,6 @@ y = datasets.target
 # print("shape: ", x.shape, y.shape)                 # (506[객체의수], 13[객체]) (506[객체의 수],)
 '''
 
-
 #1. 데이타
 datasets = load_boston()
 x = datasets.data
