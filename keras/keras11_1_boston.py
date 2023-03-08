@@ -5,7 +5,6 @@
 #1. train 0.7 ~ 0.9
 #2. R2 0.8 이상
 
-
 from sklearn.datasets import load_boston
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
