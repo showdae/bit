@@ -74,7 +74,7 @@ model.add(Dense(3, activation='softmax'))               # softmax: 라벨들의 
 model.compile(loss='categorical_crossentropy', optimizer='adam',    # adam: 평타 이상의 성능
               metrics=['acc'])
 
-model.fit(x_train, y_train, epochs=3, batch_size=1,
+model.fit(x_train, y_train, epochs=10, batch_size=4,
           validation_split=0.2,
           verbose=1,
           )
