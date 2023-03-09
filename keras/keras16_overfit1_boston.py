@@ -44,7 +44,6 @@ print("======================================")
 # 한글 타이틀은 깨짐
 # 오버핏이란: 그래프 확인시 중간중간 튀는 값
 
-
 import matplotlib.pyplot as plt
 plt.rcParams['font.family'] = 'Malgun Gothic'                                                   # 한글 깨질 경우 사용하는 함수 (Malgun Gothic 윈도우에서 제공하는 글씨체)
 plt.figure(figsize=(9,6))

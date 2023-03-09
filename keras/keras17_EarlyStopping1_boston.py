@@ -1,7 +1,8 @@
 from sklearn.datasets import load_boston
+from sklearn.model_selection import train_test_split
 from tensorflow.python.keras.models import Sequential
 from tensorflow.python.keras.layers import Dense
-from sklearn.model_selection import train_test_split
+from tensorflow.python.keras.callbacks import EarlyStopping                 # EarlyStopping 클래스 사용
 from sklearn.metrics import r2_score
 
 #1.데이터
@@ -15,7 +16,7 @@ print(x.shape, y.shape)
 x_train, x_test, y_train, y_test = train_test_split(x, y, shuffle=True, random_state=123, test_size=0.3)
 
 #2.모델 구성
-model=Sequential()
+model = Sequential()
 model.add(Dense(20, input_dim=13, activation='sigmoid'))
 model.add(Dense(50, activation='sigmoid'))
 model.add(Dense(100, activation='sigmoid'))
@@ -29,16 +30,15 @@ model.add(Dense(1, activation='linear'))
 #3. 컴파일 훈련
 model.compile(loss='mse',optimizer='adam')
 
-from tensorflow.python.keras.callbacks import EarlyStopping                 # EarlyStopping 클래스 사용
-
 # EarlyStopping: 최소의 로스 지점을 찿을 수 있다
 es = EarlyStopping(monitor='val_loss', patience=20, mode='min', verbose=1,  # EarlyStopping: patience 만큼 반복하여, min 값과 비교 후 중단
                                                                             # mode: auto or min
                    restore_best_weights=True                                # restore_best_weights: 브레이크 잡은 시점에서 최적의 W 값 저장, 디폴트: 0
                    )
 
-hist = model.fit(x_train, y_train, epochs=500, batch_size=13, validation_split=0.2, verbose=1,
-                 callbacks=[es])                                            # EarlyStopping 호출
+hist = model.fit(x_train, y_train, epochs=10, batch_size=13, validation_split=0.2, verbose=1,  # validation_split: 훈련시 모의모사 검증
+                 callbacks=[es])                                            # EarlyStopping 함수 호출
+
 
 # model.fit의 반환값
 # print("======================================")
@@ -54,12 +54,12 @@ print("======================================")
 
 #4. 평가, 예측
 loss = model.evaluate(x_test, y_test)
-print("loss", loss)
+print("loss: ", loss)
 
 y_predict = model.predict(x_test)
 
 r2 = r2_score(y_predict, y_test)
-print("r2", r2)
+print("r2: ", r2)
 
 #5. 그래프 출력
 # 과적합 그래프 모양 체크

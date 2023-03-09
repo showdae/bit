@@ -1,5 +1,5 @@
 class Knight:
-    def __init__(self, health, mana, armor):    # 이니셜
+    def __init__(self, health, mana, armor):
         self.health = health
         self.mana = mana
         self.armor = armor

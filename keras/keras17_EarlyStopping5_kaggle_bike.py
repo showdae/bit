@@ -6,7 +6,7 @@ import pandas as pd
 
 #1.데이터
 path = './_data/kaggle_bike/'
-path_save = './_save/kaggle_bike/'
+path_save = './_save/kaggle_bike/'  
 
 train_csv = pd.read_csv(path + 'train.csv',
                         index_col = 0)
