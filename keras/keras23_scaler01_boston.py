@@ -41,8 +41,6 @@ y = datasets['target']
 print(type(x))                  # type: 자료형 확인 <class 'numpy.ndarray'>
 print(x)
 
-
-
 # scaler = MinMaxScaler()
 # scaler.fit(x)                   # 준비
 # x = scaler.transform(x)         # 변환
