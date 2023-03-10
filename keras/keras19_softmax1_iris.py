@@ -2,7 +2,7 @@
 '''
 소프트맥스 함수
 input값을 [0,1] 사이의 값으로 모두 정규화하여 출력하며,
-출력값들의 총합은 항상 1이 되는 특성을 가진 함수이다. 
+출력값들의 총합은 항상 1이 되는 특성을 가진 함수이다.
 다중분류(multi-class classification) 문제에서 사용한다.
 '''
 import numpy as np
@@ -42,9 +42,17 @@ print('y의 라벨값: ', np.unique(y))                      # [0 1 2]
                 
 ##################### 요지점에서 원핫 인코딩 ###########################
 # y (150,) -> (150,3) 변경 (케라스=to_categorical, 판다스=겟더미, 사이킷런=원핫인코더)
+# 케라스
 from tensorflow.keras.utils import to_categorical
-print('==============================')
 y = to_categorical(y)                                   # (150, 3)
+
+# 판다스
+# import pandas as pd
+# pd.get_dummies(y, )
+
+#사이킷런
+
+
 print("!!!", y.shape)
 print('==============================')
 
@@ -81,13 +89,34 @@ model.fit(x_train, y_train, epochs=10, batch_size=4,
 
 #####################accuracy_score를 사용해서 스코어를 빼세요###########################
 # 넘파이에서 0 or 1로 변환
-
+'''
 #4. 평가, 예측
 result = model.evaluate(x_test, y_test)
 print('result', result)
 
-y_predict = np.round(model.predict(x_test))
-print('y_predict:', y_predict)                  # [[0. 0. 0.]
+y_predict = np.argmax(model.predict(x_test), axis=1)
+
+print('y_predict:', y_predict)
 
 acc = accuracy_score(y_test, y_predict)
-print('acc:', acc)                              #  0.0
+print('acc:', acc)
+'''
+
+#4. 평가, 예측
+results = model.evaluate(x_test, y_test)
+# print(results)
+print('loss: ', results[0])
+print('acc: ',  results[1])             # metrics=['acc']
+
+y_pred = model.predict(x_test)
+
+print(y_test.shape)                 # (30, 3) 원핫이 되어 있음
+print(y_test[:5])
+print(y_pred.shape)                 # (30, 3) 원핫이 되어 있음
+print(y_pred[:5])
+
+y_test_acc = np.argmax(y_test, axis=1)  # axis=1: 각 행에 있는 열끼리 비교
+y_pred = np.argmax(y_pred, axis=1)      # axis=1: 각 행에 있는 열끼리 비교
+
+acc = accuracy_score(y_test_acc, y_pred)
+print('accuracy_score: ', acc)

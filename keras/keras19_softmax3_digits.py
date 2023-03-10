@@ -15,19 +15,7 @@ from sklearn.metrics import accuracy_score
 #1. 데이터
 datasets = load_digits()
 print('DESCR', datasets.DESCR)                           # 판다스: describe
-'''
-    :Number of Instances: 150 (50 in each of three classes)                 # 행
-    :Number of Attributes: 4 numeric, predictive attributes and the class   # 열
-    :Attribute Information:         # 열
-        - sepal length in cm
-        - sepal width in cm
-        - petal length in cm
-        - petal width in cm
-        - class:
-                - Iris-Setosa       # 0
-                - Iris-Versicolour  # 1
-                - Iris-Virginica    # 2
-'''
+
 print('feature_names', datasets.feature_names)          # 판다스: columns
 # feature_names ['sepal length (cm)', 'sepal width (cm)', 'petal length (cm)', 'petal width (cm)']
 
@@ -76,7 +64,7 @@ model.add(Dense(10, activation='softmax'))               # softmax: 라벨들의
 model.compile(loss='categorical_crossentropy', optimizer='adam',    # adam: 평타 이상의 성능
               metrics=['acc'])
 
-model.fit(x_train, y_train, epochs=10, batch_size=64,
+model.fit(x_train, y_train, epochs=100, batch_size=64,
           validation_split=0.2,
           verbose=1,
           )
@@ -85,11 +73,20 @@ model.fit(x_train, y_train, epochs=10, batch_size=64,
 # 넘파이에서 0 or 1로 변환
 
 #4. 평가, 예측
-result = model.evaluate(x_test, y_test)
-print('result', result)
+results = model.evaluate(x_test, y_test)
+# print(results)
+print('loss: ', results[0])
+print('acc: ',  results[1])             # metrics=['acc']
 
-y_predict = np.round(model.predict(x_test))
-print('y_predict:', y_predict)
+y_pred = model.predict(x_test)
 
-acc = accuracy_score(y_test, y_predict)
-print('acc:', acc)
+print(y_test.shape)                 # (30, 3) 원핫이 되어 있음
+print(y_test[:5])
+print(y_pred.shape)                 # (30, 3) 원핫이 되어 있음
+print(y_pred[:5])
+
+y_test_acc = np.argmax(y_test, axis=1)  # axis=1: 각 행에 있는 열끼리 비교
+y_pred = np.argmax(y_pred, axis=1)      # axis=1: 각 행에 있는 열끼리 비교
+
+acc = accuracy_score(y_test_acc, y_pred)
+print('accuracy_score: ', acc)
