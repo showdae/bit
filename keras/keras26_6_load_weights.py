@@ -55,8 +55,8 @@ output1  = Dense(1, activation='linear')(dense8)
 model = Model(inputs=intput1, outputs=output1)  # 함수 정의
 
 ############################ 스케일링 ############################
-# model.load_weights('./_save/keras26_5_save_weight1.h5')     # 초기 랜덤값의 웨이트만 저장되어 있다
-model.load_weights('./_save/keras26_5_save_weight2.h5')
+# model.load_weights('./_save/keras26_5_save_weight1.h5')     # weight1: 초기 랜덤값의 웨이트 값만 저장되어 있다
+model.load_weights('./_save/keras26_5_save_weight2.h5')       # weight2: 전체 웨이트 값이 저장되어 있다
 
 model.summary()
 
