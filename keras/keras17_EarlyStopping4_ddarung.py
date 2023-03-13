@@ -70,7 +70,7 @@ es = EarlyStopping(monitor='val_loss', patience=20, mode='min', verbose=1,  # Ea
                    restore_best_weights=True                                # restore_best_weights: 브레이크 잡은 시점에서 최적의 W 값 저장, 디폴트: 0
                    )
 
-hist = model.fit(x_train, y_train, epochs=500, batch_size=13, validation_split=0.2, verbose=1,
+hist = model.fit(x_train, y_train, epochs=100, batch_size=13, validation_split=0.2, verbose=1,
                  callbacks=[es])                                            # EarlyStopping 호출
 
 # model.fit의 반환값

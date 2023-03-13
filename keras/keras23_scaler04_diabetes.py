@@ -12,8 +12,8 @@ from sklearn.metrics import r2_score, mean_squared_error, accuracy_score
 # 4종류의 함수 사용법은 똑같다
 from sklearn.preprocessing import MinMaxScaler 
 # from sklearn.preprocessing import StandardScaler # StandardScaler: 평균점을 중심으로 데이터를 정규화한다
-# from sklearn.preprocessing import MaxAbsScaler 최대 절대값
-# from sklearn.preprocessing import RobustScaler 
+# from sklearn.preprocessing import MaxAbsScaler
+# from sklearn.preprocessing import RobustScaler
 
 #1. 정규화
 ##################### csv 로드 ###########################
@@ -63,10 +63,13 @@ x_train, x_test, y_train, y_test = train_test_split(
 # 주의사항: 모든 데이터를 정규화할 경우 과적합이 발생할 수 있다
 
 scaler = MinMaxScaler()
-# scaler = StandardScaler()                 # StandardScaler 사용법  
+# scaler = StandardScaler()                 # StandardScaler 사용법
+# scaler = MaxAbsScaler()                   # MaxAbsScaler 사용법
+# scaler = RobustScaler()                   # RobustScaler 사용법
 scaler.fit(x_train)                         # 준비
-x_train = scaler.transform(x_train)         # 변환
-x_test = scaler.transform(x_test)
+x_train = scaler.transform(x_train)         # 변환 (train_csv)
+x_test = scaler.transform(x_test)           # 변환 (train_csv)
+test_csv = scaler.transform(test_csv)       # 변환 (test_csv)
 print('min/max: ',np.min(x_test), np.max(x_test))
 
 

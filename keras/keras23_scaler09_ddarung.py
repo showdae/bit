@@ -1,4 +1,3 @@
-from sklearn.datasets import load_boston
 from sklearn.model_selection import train_test_split
 from tensorflow.python.keras.models import Sequential
 from tensorflow.python.keras.layers import Dense
@@ -10,9 +9,9 @@ import pandas as pd
 # 스케일러의 종류
 # 4종류의 함수 사용법은 똑같다
 from sklearn.preprocessing import MinMaxScaler 
-# from sklearn.preprocessing import StandardScaler # StandardScaler: 평균점을 중심으로 데이터를 정규화한다
-# from sklearn.preprocessing import MaxAbsScaler 최대 절대값
-# from sklearn.preprocessing import RobustScaler 
+from sklearn.preprocessing import StandardScaler    # StandardScaler: 평균점을 중심으로 데이터를 정규화한다
+from sklearn.preprocessing import MaxAbsScaler      #최대 절대값
+from sklearn.preprocessing import RobustScaler 
 
 #1. 정규화
 ##################### csv 로드 ###########################
@@ -69,11 +68,15 @@ x_test, x_val, y_test, y_val = train_test_split(
 
 # 주의사항: 모든 데이터를 정규화할 경우 과적합이 발생할 수 있다
 
-scaler = MinMaxScaler()
-# scaler = StandardScaler()                 # StandardScaler 사용법  
+scaler = MinMaxScaler()                   # MinMaxScaler 사용법
+# scaler = StandardScaler()                 # StandardScaler 사용법
+# scaler = MaxAbsScaler()                   # MaxAbsScaler 사용법
+# scaler = RobustScaler()                   # RobustScaler 사용법
+
 scaler.fit(x_train)                         # 준비
-x_train = scaler.transform(x_train)         # 변환
-x_test = scaler.transform(x_test)
+x_train = scaler.transform(x_train)         # 변환 (train_csv)
+x_test = scaler.transform(x_test)           # 변환 (train_csv)
+test_csv = scaler.transform(test_csv)       # 변환 (test_csv)
 print('min/max: ',np.min(x_test), np.max(x_test))
 
 #2.모델 구성
@@ -99,7 +102,7 @@ es = EarlyStopping(monitor='val_loss', patience=20, mode='min', verbose=1,  # Ea
                    restore_best_weights=True                                # restore_best_weights: 브레이크 잡은 시점에서 최적의 W 값 저장, 디폴트: 0
                    )
 
-hist = model.fit(x_train, y_train, epochs=500, batch_size=13, validation_split=0.2, verbose=1,
+hist = model.fit(x_train, y_train, epochs=100, batch_size=13, validation_split=0.2, verbose=1,
                  callbacks=[es])                                            # EarlyStopping 호출
 
 # model.fit의 반환값
@@ -139,3 +142,59 @@ plt.ylabel('로스, 발로스')
 plt.legend()
 plt.grid()
 plt.show()
+
+
+'''
+정규화 테스트 결과
+노말
+    loss 3532.9267578125
+    r2 -0.07619412139537007
+
+    loss 3390.755126953125
+    r2 0.03499841418967753
+
+    loss 3720.37841796875
+    r2 -0.028389494341979127
+
+
+스케일링
+MinMaxScaler
+    loss 2706.042724609375
+    r2 0.313438303299426
+
+    loss 2771.231201171875
+    r2 0.266694543043391
+
+    loss 2773.159912109375
+    r2 0.2540985052813247
+
+StandardScaler
+    loss 2873.26025390625
+    r2 0.25986038296227554
+
+    loss 2866.111083984375
+    r2 0.22595538400081372
+
+    loss 2873.531982421875
+    r2 0.2249937217424417
+
+MaxAbsScaler
+    loss 2745.104736328125
+    r2 0.29193753015885016
+
+    loss 2793.201171875
+    r2 0.2629141716368739
+
+    loss 2758.197509765625
+    r2 0.27966464084474263
+
+RobustScaler
+    loss 2833.240478515625
+    r2 0.28576739140556184
+
+    loss 2802.8203125
+    r2 0.28247633779015724
+
+    loss 2885.658203125
+    r2 0.23711433112752234
+'''

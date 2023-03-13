@@ -58,10 +58,13 @@ print("y_train.shape, y_test.shape", y_train.shape, y_test.shape)
 # 주의사항: 모든 데이터를 정규화할 경우 과적합이 발생할 수 있다
 
 scaler = MinMaxScaler()
-# scaler = StandardScaler()                 # StandardScaler 사용법  
+# scaler = StandardScaler()                 # StandardScaler 사용법
+# scaler = MaxAbsScaler()                   # MaxAbsScaler 사용법
+# scaler = RobustScaler()                   # RobustScaler 사용법  
 scaler.fit(x_train)                         # 준비
-x_train = scaler.transform(x_train)         # 변환
-x_test = scaler.transform(x_test)
+x_train = scaler.transform(x_train)         # 변환 (train_csv)
+x_test = scaler.transform(x_test)           # 변환 (train_csv)
+test_csv = scaler.transform(test_csv)       # 변환 (test_csv)
 print('min/max: ',np.min(x_test), np.max(x_test))
 
 #2.모델 구성

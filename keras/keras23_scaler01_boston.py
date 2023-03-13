@@ -13,7 +13,7 @@
 # max - min
 
 # 장점
-# 오버플러우 언더플로우가 발생하지 않는다
+# 오버플로우 언더플로우가 발생하지 않는다
 # 속도가 빨라진다
 # 성능이 좋아질수도 있다
 # input data를 0 ~ 1
@@ -32,8 +32,8 @@ from sklearn.metrics import r2_score
 # 스케일러의 종류
 # 4종류의 함수 사용법은 똑같다
 from sklearn.preprocessing import MinMaxScaler 
-# from sklearn.preprocessing import StandardScaler # StandardScaler: 평균점을 중심으로 데이터를 정규화한다
-# from sklearn.preprocessing import MaxAbsScaler 최대 절대값
+# from sklearn.preprocessing import StandardScaler
+# from sklearn.preprocessing import MaxAbsScaler
 # from sklearn.preprocessing import RobustScaler 
 
 #1. 정규화
@@ -65,8 +65,10 @@ x_train, x_test, y_train, y_test = train_test_split(
                                 random_state = 1333
 )
 
-scaler = MinMaxScaler()
-# scaler = StandardScaler()                 # StandardScaler 사용법  
+scaler = MinMaxScaler()                     # MinMaxScaler 사용법
+# scaler = StandardScaler()                 # StandardScaler 사용법
+# scaler = MaxAbsScaler()                   # MaxAbsScaler 사용법
+# scaler = RobustScaler()                   # RobustScaler 사용법
 scaler.fit(x_train)                         # 준비
 x_train = scaler.transform(x_train)         # 변환
 x_test = scaler.transform(x_test)

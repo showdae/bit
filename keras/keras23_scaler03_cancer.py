@@ -5,6 +5,7 @@ from tensorflow.python.keras.layers import Dense
 import numpy as np
 from tensorflow.python.keras.callbacks import EarlyStopping                 # EarlyStopping 클래스 사용
 from sklearn.metrics import r2_score
+from sklearn.metrics import accuracy_score
 
 # 스케일러의 종류
 # 4종류의 함수 사용법은 똑같다
