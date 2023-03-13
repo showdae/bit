@@ -135,7 +135,7 @@ y_predict = np.round(model.predict(x_test))                 # np.round(): 반올
 acc = accuracy_score(y_test, y_predict)                     # 실제 y
 print('acc:', acc)                                          # acc: 0.7251908396946565 (높을수록 좋다)
 
-#5. csv 출력
+##################### submission.csv 만들기 ###########################
 # print(test_csv.insull().sum())
 y_submit = np.round(model.predict(test_csv))                # round: 반올림
 # print("y_submit: ", y_submit)

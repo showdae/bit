@@ -7,6 +7,7 @@ import numpy as np
 from tensorflow.python.keras.callbacks import EarlyStopping                 # EarlyStopping 클래스 사용
 from sklearn.metrics import r2_score
 import pandas as pd
+from sklearn.metrics import r2_score, mean_squared_error
 
 # 스케일러의 종류
 # 4종류의 함수 사용법은 똑같다
@@ -18,6 +19,7 @@ from sklearn.preprocessing import RobustScaler
 #1. 정규화
 ##################### csv 로드 ###########################
 path = './_data/ddarung/'                                   # . = study(현재폴더), / 하단
+path_save = './_save/ddarung/'
 
 train_csv = pd.read_csv(path + 'train.csv',                 # 판다스 csv 파일 리딩
                         index_col = 0)                      # id 제거
@@ -144,85 +146,20 @@ y_predict = model.predict(x_test)
 r2 = r2_score(y_predict, y_test)
 print("r2", r2)
 
-#5. 그래프 출력
-# 과적합 그래프 모양 체크
-# 한글 타이틀은 깨짐
-# 오버핏이란: 그래프 확인시 중간중간 튀는 값
+def RMSE(y_test, y_predict):                                                            # 사용자 정의 함수 만드는 법!!!!
+    return np.sqrt(mean_squared_error(y_test, y_predict))                               # return: 반환, np.sqrt(): 루트 적용, mean_squared_error: mse
+rmse = RMSE(y_test, y_predict)                                                          # RMSE 함수 호출
+print("rmse score: ", rmse)
 
-import matplotlib.pyplot as plt
-plt.rcParams['font.family'] = 'Malgun Gothic'                                                   
-plt.figure(figsize=(9,6))
-plt.plot(hist.history['loss'], marker = '.', color = 'red', label = 'loss')
-plt.plot(hist.history['val_loss'], marker='.', color = 'blue', label = 'val_loss')
-plt.title('따릉이')
-plt.xlabel('epochs')
-plt.ylabel('로스, 발로스')
-plt.legend()
-plt.grid()
-plt.show()
+##################### submission.csv 만들기 ###########################
+# print(test_csv.insull().sum())                            # 요기도 결측치가 있네!!!
+y_submit = model.predict(test_csv)
+print(y_submit)
 
+submission = pd.read_csv(path + "submission.csv", index_col=0)
+print(submission)
 
-'''
-정규화 테스트 결과
-노말
-    loss 3532.9267578125
-    r2 -0.07619412139537007
+submission['count'] = y_submit
+print(submission)
 
-    loss 3390.755126953125
-    r2 0.03499841418967753
-
-    loss 3720.37841796875
-    r2 -0.028389494341979127
-
-
-스케일링
-MinMaxScaler
-    loss 2706.042724609375
-    r2 0.313438303299426
-
-    loss 2771.231201171875
-    r2 0.266694543043391
-
-    loss 2773.159912109375
-    r2 0.2540985052813247
-
-StandardScaler
-    loss 2873.26025390625
-    r2 0.25986038296227554
-
-    loss 2866.111083984375
-    r2 0.22595538400081372
-
-    loss 2873.531982421875
-    r2 0.2249937217424417
-
-MaxAbsScaler
-    loss 2745.104736328125
-    r2 0.29193753015885016
-
-    loss 2793.201171875
-    r2 0.2629141716368739
-
-    loss 2758.197509765625
-    r2 0.27966464084474263
-
-RobustScaler
-    loss 2833.240478515625
-    r2 0.28576739140556184
-
-    loss 2802.8203125
-    r2 0.28247633779015724
-
-    loss 2885.658203125
-    r2 0.23711433112752234
-    
-함수형 모델
-    loss 2720.650390625
-    r2 0.25058543580849335
-
-    loss 2718.094482421875
-    r2 0.2533365254471278
-
-    loss 2774.20458984375
-    r2 0.23986856017729252
-'''
+submission.to_csv(path_save + "ddarung_submit.csv")

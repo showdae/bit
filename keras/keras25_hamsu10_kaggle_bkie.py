@@ -132,19 +132,15 @@ y_predict = model.predict(x_test)
 r2 = r2_score(y_predict, y_test)
 print("r2", r2)
 
-#5. 그래프 출력
-# 과적합 그래프 모양 체크
-# 한글 타이틀은 깨짐
-# 오버핏이란: 그래프 확인시 중간중간 튀는 값
+##################### submission.csv 만들기 ###########################
+# print(test_csv.insull().sum())                                    # 요기도 결측치가 있네!!!
+y_submit = model.predict(test_csv)                                  # 예측값
+print("y_submit: ", y_submit)
 
-import matplotlib.pyplot as plt
-plt.rcParams['font.family'] = 'Malgun Gothic'                                                   
-plt.figure(figsize=(9,6))
-plt.plot(hist.history['loss'], marker = '.', color = 'red', label = 'loss')
-plt.plot(hist.history['val_loss'], marker='.', color = 'blue', label = 'val_loss')
-plt.title('케글 바이크')
-plt.xlabel('epochs')
-plt.ylabel('로스, 발로스')
-plt.legend()
-plt.grid()
-plt.show()
+submission = pd.read_csv(path + "sampleSubmission.csv", index_col=0)    # sampleSubmission.csv 리드
+print("submission: ", submission)
+
+submission['count'] = y_submit          # test.csv 예측값을 submission 변수에 넣어준다
+print("submission: ", submission)
+
+submission.to_csv(path_save + "kaggle_bike_submit.csv")         # csv 출력 끝!!!
