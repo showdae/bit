@@ -1,6 +1,6 @@
 from sklearn.model_selection import train_test_split
-from tensorflow.python.keras.models import Sequential
-from tensorflow.python.keras.layers import Dense
+from tensorflow.python.keras.models import Sequential, Model
+from tensorflow.python.keras.layers import Dense, Input
 import numpy as np
 from tensorflow.python.keras.callbacks import EarlyStopping                 # EarlyStopping 클래스 사용
 from sklearn.metrics import r2_score
@@ -72,7 +72,7 @@ x_test = scaler.transform(x_test)           # 변환 (train_csv)
 test_csv = scaler.transform(test_csv)       # 변환 (test_csv)
 print('min/max: ',np.min(x_test), np.max(x_test))
 
-
+'''
 #2. 모델
 model = Sequential()
 model.add(Dense(10, activation='linear', input_dim=8))
@@ -88,6 +88,25 @@ model.add(Dense(100, activation='relu'))
 model.add(Dense(50, activation='relu'))
 model.add(Dense(20, activation='relu'))
 model.add(Dense(1, activation='sigmoid'))
+'''
+
+#2.모델 구성                                    # 함수형 모델
+intput1 = Input(shape=(8,))                    # 스칼렛 13개, 벡터 1개 (열의 형식을 적용)
+dense1  = Dense(10, activation='linear')(intput1)
+dense2  = Dense(20,activation='relu')(dense1)
+dense3  = Dense(50,activation='relu')(dense2)
+dense4  = Dense(100,activation='relu')(dense3)
+dense5  = Dense(150,activation='relu')(dense4)
+dense6  = Dense(200,activation='relu')(dense5)
+dense7  = Dense(300,activation='relu')(dense6)
+dense8  = Dense(200,activation='relu')(dense7)
+dense9  = Dense(150,activation='relu')(dense8)
+dense10  = Dense(100,activation='relu')(dense9)
+dense11  = Dense(50,activation='relu')(dense10)
+dense12  = Dense(20,activation='relu')(dense11)
+output1  = Dense(1, activation='sigmoid')(dense12)
+
+model = Model(inputs=intput1, outputs=output1)  # 함수 정의
 
 #3. 컴파일, 훈련
 model.compile(loss='binary_crossentropy', optimizer='adam',

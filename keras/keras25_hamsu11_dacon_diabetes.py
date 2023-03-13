@@ -1,19 +1,18 @@
 from sklearn.model_selection import train_test_split
-from tensorflow.python.keras.models import Sequential
-from tensorflow.python.keras.layers import Dense
+from tensorflow.python.keras.models import Sequential, Model
+from tensorflow.python.keras.layers import Dense, Input
 import numpy as np
 from tensorflow.python.keras.callbacks import EarlyStopping                 # EarlyStopping 클래스 사용
 from sklearn.metrics import r2_score
 import pandas as pd
 from sklearn.metrics import r2_score, mean_squared_error, accuracy_score
 
-
 # 스케일러의 종류
 # 4종류의 함수 사용법은 똑같다
 from sklearn.preprocessing import MinMaxScaler 
 # from sklearn.preprocessing import StandardScaler # StandardScaler: 평균점을 중심으로 데이터를 정규화한다
-# from sklearn.preprocessing import MaxAbsScaler
-# from sklearn.preprocessing import RobustScaler
+# from sklearn.preprocessing import MaxAbsScaler 최대 절대값
+# from sklearn.preprocessing import RobustScaler 
 
 #1. 정규화
 ##################### csv 로드 ###########################
@@ -46,7 +45,6 @@ print("x.shape: ", x.shape)                         # (652, 8)
 y = train_csv['Outcome']
 print("y.shape: ", y.shape)                         # (652,)
 
-
 x_train, x_test, y_train, y_test = train_test_split(
                                 x, y,
                                 train_size = 0.81,
@@ -63,16 +61,16 @@ x_train, x_test, y_train, y_test = train_test_split(
 # 주의사항: 모든 데이터를 정규화할 경우 과적합이 발생할 수 있다
 
 scaler = MinMaxScaler()
-# scaler = StandardScaler()                 # StandardScaler 사용법
-# scaler = MaxAbsScaler()                   # MaxAbsScaler 사용법
-# scaler = RobustScaler()                   # RobustScaler 사용법
+# scaler = StandardScaler()                 # StandardScaler 사용법  
 scaler.fit(x_train)                         # 준비
-x_train = scaler.transform(x_train)         # 변환 (train_csv)
-x_test = scaler.transform(x_test)           # 변환 (train_csv)
-test_csv = scaler.transform(test_csv)       # 변환 (test_csv)
+x_train = scaler.transform(x_train)         # 변환
+x_test = scaler.transform(x_test)
 print('min/max: ',np.min(x_test), np.max(x_test))
 
+print("x_train.shape, x_test.shape", x_train.shape, x_test.shape)
+print("y_train.shape, y_test.shape", y_train.shape, y_test.shape)
 
+'''
 #2. 모델
 model = Sequential()
 model.add(Dense(10, activation='linear', input_dim=8))
@@ -88,6 +86,25 @@ model.add(Dense(100, activation='relu'))
 model.add(Dense(50, activation='relu'))
 model.add(Dense(20, activation='relu'))
 model.add(Dense(1, activation='sigmoid'))
+'''
+
+#2.모델 구성                                        # 함수형 모델
+intput1 = Input(shape=(8,))                        # 스칼렛 13개, 벡터 1개 (열의 형식을 적용)
+dense1  = Dense(10, activation='linear')(intput1)
+dense2  = Dense(20, activation='relu')(dense1)
+dense3  = Dense(50, activation='relu')(dense2)
+dense4  = Dense(100, activation='relu')(dense3)
+dense5  = Dense(150, activation='relu')(dense4)
+dense6  = Dense(200, activation='relu')(dense5)
+dense7  = Dense(300, activation='relu')(dense6)
+dense8  = Dense(200, activation='relu')(dense7)
+dense9  = Dense(150, activation='relu')(dense8)
+dense10  = Dense(100, activation='relu')(dense9)
+dense11  = Dense(50, activation='relu')(dense10)
+dense12  = Dense(20, activation='relu')(dense11)
+output1  = Dense(1, activation='sigmoid')(dense12)
+
+model = Model(inputs=intput1, outputs=output1)      # 함수 정의
 
 #3. 컴파일, 훈련
 model.compile(loss='binary_crossentropy', optimizer='adam',
@@ -116,7 +133,7 @@ print('acc:', acc)                                          # acc: 0.72519083969
 
 #5. csv 출력
 # print(test_csv.insull().sum())
-y_submit = np.round(model.predict(test_csv))                # round: 반올림
+y_submit = np.round(model.predict(test_csv))
 # print("y_submit: ", y_submit)
 
 submission = pd.read_csv(path + "sample_submission.csv", index_col=0)
