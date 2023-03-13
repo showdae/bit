@@ -5,6 +5,7 @@ from sklearn.metrics import r2_score
 import pandas as pd
 
 #1.데이터
+##################### csv 로드 ###########################
 path = './_data/kaggle_bike/'
 path_save = './_save/kaggle_bike/'  
 

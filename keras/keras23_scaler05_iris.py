@@ -1,60 +1,69 @@
-# 다중 분류
-'''
-소프트맥스 함수
-input값을 [0,1] 사이의 값으로 모두 정규화하여 출력하며,
-출력값들의 총합은 항상 1이 되는 특성을 가진 함수이다. 
-다중분류(multi-class classification) 문제에서 사용한다.
-'''
-import numpy as np
-from sklearn.datasets import load_digits
+from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from tensorflow.python.keras.models import Sequential
 from tensorflow.python.keras.layers import Dense
+import numpy as np
+from tensorflow.python.keras.callbacks import EarlyStopping                 # EarlyStopping 클래스 사용
+from sklearn.metrics import r2_score
 from sklearn.metrics import accuracy_score
 
-#1. 데이터
-datasets = load_digits()
-print('DESCR', datasets.DESCR)                              # 판다스: describe
+# 스케일러의 종류
+# 4종류의 함수 사용법은 똑같다
+from sklearn.preprocessing import MinMaxScaler 
+# from sklearn.preprocessing import StandardScaler # StandardScaler: 평균점을 중심으로 데이터를 정규화한다
+# from sklearn.preprocessing import MaxAbsScaler 최대 절대값
+# from sklearn.preprocessing import RobustScaler 
 
-print('feature_names', datasets.feature_names)          # 판다스: columns
-# feature_names ['sepal length (cm)', 'sepal width (cm)', 'petal length (cm)', 'petal width (cm)']
-
+#1. 정규화
+datasets = load_iris()
 x = datasets.data
 y = datasets['target']
-print('==============================')
-print('!!!', x.shape, y.shape)                                 # (1797, 64) (1797,)
-print('==============================')
+
+print('type(x)',type(x))
 print('x', x)
-print('y', y)
-print('y의 라벨값: ', np.unique(y))                      #  [0 1 2 3 4 5 6 7 8 9]
+print('y의 라벨값: ', np.unique(y))                      # [0 1 2]
                                                         # np.unique(y): 값의 종류 리턴
-          
-                       
+                                                        
 ##################### 요지점에서 원핫 인코딩 ###########################
 # y (150,) -> (150,3) 변경 (케라스=to_categorical, 판다스=겟더미, 사이킷런=원핫인코더)
+# 케라스
 from tensorflow.keras.utils import to_categorical
-print('==============================')
-y = to_categorical(y)                                   # (1797, 10)
+y = to_categorical(y)                                   # (150, 3)
+
 print("!!!", y.shape)
 print('==============================')
 
 x_train, x_test, y_train, y_test = train_test_split(
-                                    x, y,
-                                    shuffle = True,
-                                    train_size = 0.8,
-                                    stratify = y,
-                                    # random_state = 333
+                                x, y,
+                                train_size = 0.81,
+                                shuffle = True,
+                                random_state = 1333
 )
 
-print('y_train', y_train)
+print('y_train', y_train)                               # [1 0 0 2 0 2 0 2 0 2 1 2 1 1 1]
 print(np.unique(y_train, return_counts=True))           # array([5, 5, 5]: 값의 갯수 리턴
+
+# 정규화 방법
+#1 train / test 분리 후에 정규화 한다
+#2 train 데이터만 먼저 정규화 해준다
+#3 train 데이터 비율 test 데이터를 정규화 해준다
+#4 test 데이터는 1을 넘어서도 상관 없다
+
+# 주의사항: 모든 데이터를 정규화할 경우 과적합이 발생할 수 있다
+
+scaler = MinMaxScaler()
+# scaler = StandardScaler()                 # StandardScaler 사용법  
+scaler.fit(x_train)                         # 준비
+x_train = scaler.transform(x_train)         # 변환
+x_test = scaler.transform(x_test)
+print('min/max: ',np.min(x_test), np.max(x_test))
 
 #2. 모델
 model = Sequential()
-model.add(Dense(10, activation='relu', input_dim=64))    # relu: 양수만 추출
+model.add(Dense(10, activation='relu', input_dim=4))    # relu: 양수만 추출
 model.add(Dense(20, activation='relu'))
 model.add(Dense(10, activation='relu'))
-model.add(Dense(10, activation='softmax'))               # softmax: 라벨들의 합이 1, 가장 놓은 라벨값을 추출 !!!
+model.add(Dense(3, activation='softmax'))               # softmax: 라벨들의 합이 1, 가장 놓은 라벨값을 추출 !!!
                                                         # output layer: 라벨의 갯수만큼 노드를 설정한다 !!!
                                                         # 원핫 인코딩: 표현하고 싶은 단어의 인덱스에 1의 값을 부여하고,
                                                         #             다른 인덱스에는 0을 부여하는 벡터 표현 방식
@@ -64,13 +73,25 @@ model.add(Dense(10, activation='softmax'))               # softmax: 라벨들의
 model.compile(loss='categorical_crossentropy', optimizer='adam',    # adam: 평타 이상의 성능
               metrics=['acc'])
 
-model.fit(x_train, y_train, epochs=100, batch_size=64,
+model.fit(x_train, y_train, epochs=10, batch_size=4,
           validation_split=0.2,
           verbose=1,
           )
 
 #####################accuracy_score를 사용해서 스코어를 빼세요###########################
 # 넘파이에서 0 or 1로 변환
+'''
+#4. 평가, 예측
+result = model.evaluate(x_test, y_test)
+print('result', result)
+
+y_predict = np.argmax(model.predict(x_test), axis=1)
+
+print('y_predict:', y_predict)
+
+acc = accuracy_score(y_test, y_predict)
+print('acc:', acc)
+'''
 
 #4. 평가, 예측
 results = model.evaluate(x_test, y_test)

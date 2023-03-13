@@ -46,6 +46,7 @@ x_test, x_val, y_test, y_val = train_test_split(
                                                                                     # 결츨치 제거 후
 # print(x_train.shape, x_test.shape)                      # (1021, 9) (438, 9)    ->  (929, 9) (399, 9)
 # print(y_train.shape, y_test.shape)                      # (1021,) (438,)        ->  (929,) (399,)
+
 #2.모델 구성
 model=Sequential()
 model.add(Dense(20, input_dim=9, activation='sigmoid'))

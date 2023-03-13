@@ -1,50 +1,58 @@
-# 다중 분류
-'''
-소프트맥스 함수
-input값을 [0,1] 사이의 값으로 모두 정규화하여 출력하며,
-출력값들의 총합은 항상 1이 되는 특성을 가진 함수이다. 
-다중분류(multi-class classification) 문제에서 사용한다.
-'''
-import numpy as np
 from sklearn.datasets import load_digits
 from sklearn.model_selection import train_test_split
 from tensorflow.python.keras.models import Sequential
 from tensorflow.python.keras.layers import Dense
+import numpy as np
+from tensorflow.python.keras.callbacks import EarlyStopping                 # EarlyStopping 클래스 사용
+from sklearn.metrics import r2_score
 from sklearn.metrics import accuracy_score
 
-#1. 데이터
+# 스케일러의 종류
+# 4종류의 함수 사용법은 똑같다
+from sklearn.preprocessing import MinMaxScaler 
+# from sklearn.preprocessing import StandardScaler # StandardScaler: 평균점을 중심으로 데이터를 정규화한다
+# from sklearn.preprocessing import MaxAbsScaler 최대 절대값
+# from sklearn.preprocessing import RobustScaler 
+
+#1. 정규화
 datasets = load_digits()
-print('DESCR', datasets.DESCR)                              # 판다스: describe
-
-print('feature_names', datasets.feature_names)          # 판다스: columns
-# feature_names ['sepal length (cm)', 'sepal width (cm)', 'petal length (cm)', 'petal width (cm)']
-
 x = datasets.data
 y = datasets['target']
-print('==============================')
-print('!!!', x.shape, y.shape)                                 # (1797, 64) (1797,)
-print('==============================')
+
+print('type(x)',type(x))
 print('x', x)
-print('y', y)
 print('y의 라벨값: ', np.unique(y))                      #  [0 1 2 3 4 5 6 7 8 9]
                                                         # np.unique(y): 값의 종류 리턴
-          
-                       
+                                                                                
 ##################### 요지점에서 원핫 인코딩 ###########################
 # y (150,) -> (150,3) 변경 (케라스=to_categorical, 판다스=겟더미, 사이킷런=원핫인코더)
 from tensorflow.keras.utils import to_categorical
 print('==============================')
 y = to_categorical(y)                                   # (1797, 10)
 print("!!!", y.shape)
-print('==============================')
+print('==============================')    
 
 x_train, x_test, y_train, y_test = train_test_split(
-                                    x, y,
-                                    shuffle = True,
-                                    train_size = 0.8,
-                                    stratify = y,
-                                    # random_state = 333
+                                x, y,
+                                train_size = 0.81,
+                                shuffle = True,
+                                random_state = 1333
 )
+
+# 정규화 방법
+#1 train / test 분리 후에 정규화 한다
+#2 train 데이터만 먼저 정규화 해준다
+#3 train 데이터 비율 test 데이터를 정규화 해준다
+#4 test 데이터는 1을 넘어서도 상관 없다
+
+# 주의사항: 모든 데이터를 정규화할 경우 과적합이 발생할 수 있다
+
+scaler = MinMaxScaler()
+# scaler = StandardScaler()                 # StandardScaler 사용법  
+scaler.fit(x_train)                         # 준비
+x_train = scaler.transform(x_train)         # 변환
+x_test = scaler.transform(x_test)
+print('min/max: ',np.min(x_test), np.max(x_test))
 
 print('y_train', y_train)
 print(np.unique(y_train, return_counts=True))           # array([5, 5, 5]: 값의 갯수 리턴

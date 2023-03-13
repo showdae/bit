@@ -1,26 +1,3 @@
-# 사이킷런 재설치
-# pip uninstall scikit-learn
-# pip install scikit-learn==1.1.0 (해당 버젼 설치)
-# pip list
-# scikit-learn                  1.1.0 (현재버젼)
-
-# scaler
-
-# 정규화
-# 최대값을 최대값으로 나누어 0~1 사이로 만든다
-# x - min
-# -------
-# max - min
-
-# 장점
-# 오버플러우 언더플로우가 발생하지 않는다
-# 속도가 빨라진다
-# 성능이 좋아질수도 있다
-# input data를 0 ~ 1
-
-# 단점
-# 성능이 안 좋아질수도 있다
-
 from sklearn.datasets import load_boston
 from sklearn.model_selection import train_test_split
 from tensorflow.python.keras.models import Sequential
@@ -28,6 +5,7 @@ from tensorflow.python.keras.layers import Dense
 import numpy as np
 from tensorflow.python.keras.callbacks import EarlyStopping                 # EarlyStopping 클래스 사용
 from sklearn.metrics import r2_score
+import pandas as pd
 
 # 스케일러의 종류
 # 4종류의 함수 사용법은 똑같다
@@ -37,18 +15,51 @@ from sklearn.preprocessing import MinMaxScaler
 # from sklearn.preprocessing import RobustScaler 
 
 #1. 정규화
-datasets = load_boston()
-x = datasets.data
-y = datasets['target']
+##################### csv 로드 ###########################
+path = './_data/ddarung/'                                   # . = study(현재폴더), / 하단
 
-print('type(x)',type(x))                  # type: 자료형 확인 <class 'numpy.ndarray'>
-print('x', x)
+train_csv = pd.read_csv(path + 'train.csv',                 # 판다스 csv 파일 리딩
+                        index_col = 0)                      # id 제거
 
-# scaler = MinMaxScaler()
-# scaler.fit(x)                   # 준비
-# x = scaler.transform(x)         # 변환
+test_csv = pd.read_csv(path + 'test.csv',                   # 판다스 csv 파일 리딩
+                        index_col = 0)                      # id 제거
 
-# print(np.min(x), np.max(x))     # 0.0 1.0
+##################### 결측치 처리 ###########################
+# 결측치 처리 1. 제거
+# print(train_csv.isnull())
+print(train_csv.isnull().sum())
+train_csv = train_csv.dropna()          # 결측치 제거
+print(train_csv.isnull().sum())
+print(train_csv.info())
+print(train_csv.shape)
+
+##################### train.csv 데이터에서 x와 y를 분리 ###########################
+x = train_csv.drop(['count'], axis= 1 )
+print(x)
+
+y = train_csv['count']
+print(y)
+
+##################### train.csv 데이터에서 x와 y를 분리 ###########################
+x = train_csv.drop(['count'], axis= 1 )
+print(x)
+
+y = train_csv['count']
+print(y)
+
+x_train, x_test, y_train, y_test = train_test_split(
+                                    x, y,
+                                    shuffle = True,
+                                    train_size=0.65,
+                                    random_state=777
+)
+
+x_test, x_val, y_test, y_val = train_test_split(
+                                    x_test, y_test,
+                                    shuffle = True,
+                                    train_size=0.5,
+                                    random_state=777
+)
 
 # 정규화 방법
 #1 train / test 분리 후에 정규화 한다
@@ -58,23 +69,16 @@ print('x', x)
 
 # 주의사항: 모든 데이터를 정규화할 경우 과적합이 발생할 수 있다
 
-x_train, x_test, y_train, y_test = train_test_split(
-                                x, y,
-                                train_size = 0.81,
-                                shuffle = True,
-                                random_state = 1333
-)
-
 scaler = MinMaxScaler()
 # scaler = StandardScaler()                 # StandardScaler 사용법  
 scaler.fit(x_train)                         # 준비
 x_train = scaler.transform(x_train)         # 변환
 x_test = scaler.transform(x_test)
-print('min/max: ',np.min(x_test), np.max(x_test))     # 0.0 1.0
+print('min/max: ',np.min(x_test), np.max(x_test))
 
 #2.모델 구성
-model = Sequential()
-model.add(Dense(20, input_dim=13, activation='sigmoid'))
+model=Sequential()
+model.add(Dense(20, input_dim=9, activation='sigmoid'))
 model.add(Dense(50, activation='sigmoid'))
 model.add(Dense(100, activation='sigmoid'))
 model.add(Dense(150, activation='relu'))
@@ -87,15 +91,16 @@ model.add(Dense(1, activation='linear'))
 #3. 컴파일 훈련
 model.compile(loss='mse',optimizer='adam')
 
+from tensorflow.python.keras.callbacks import EarlyStopping                 # EarlyStopping 클래스 사용
+
 # EarlyStopping: 최소의 로스 지점을 찿을 수 있다
 es = EarlyStopping(monitor='val_loss', patience=20, mode='min', verbose=1,  # EarlyStopping: patience 만큼 반복하여, min 값과 비교 후 중단
                                                                             # mode: auto or min
                    restore_best_weights=True                                # restore_best_weights: 브레이크 잡은 시점에서 최적의 W 값 저장, 디폴트: 0
                    )
 
-hist = model.fit(x_train, y_train, epochs=10, batch_size=13, validation_split=0.2, verbose=1,  # validation_split: 훈련시 모의모사 검증
-                 callbacks=[es])                                            # EarlyStopping 함수 호출
-
+hist = model.fit(x_train, y_train, epochs=500, batch_size=13, validation_split=0.2, verbose=1,
+                 callbacks=[es])                                            # EarlyStopping 호출
 
 # model.fit의 반환값
 # print("======================================")
@@ -111,13 +116,12 @@ print("======================================")
 
 #4. 평가, 예측
 loss = model.evaluate(x_test, y_test)
-print("loss: ", loss)
+print("loss", loss)
 
 y_predict = model.predict(x_test)
 
 r2 = r2_score(y_predict, y_test)
-print("r2: ", r2)
-
+print("r2", r2)
 
 #5. 그래프 출력
 # 과적합 그래프 모양 체크
@@ -129,7 +133,7 @@ plt.rcParams['font.family'] = 'Malgun Gothic'
 plt.figure(figsize=(9,6))
 plt.plot(hist.history['loss'], marker = '.', color = 'red', label = 'loss')
 plt.plot(hist.history['val_loss'], marker='.', color = 'blue', label = 'val_loss')
-plt.title('보스턴')
+plt.title('따릉이')
 plt.xlabel('epochs')
 plt.ylabel('로스, 발로스')
 plt.legend()
