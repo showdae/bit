@@ -1,3 +1,5 @@
+# 함수형 모델
+
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from tensorflow.python.keras.models import Sequential, Model

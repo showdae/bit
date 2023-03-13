@@ -1,3 +1,5 @@
+# 함수형 모델
+
 from sklearn.model_selection import train_test_split
 from tensorflow.python.keras.models import Sequential, Model
 from tensorflow.python.keras.layers import Dense, Input
