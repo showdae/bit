@@ -64,8 +64,8 @@ x_train, x_test, y_train, y_test = train_test_split(
                                     # random_state = 333
 )
 
-print('y_train', y_train)                               # [1 0 0 2 0 2 0 2 0 2 1 2 1 1 1]
-print(np.unique(y_train, return_counts=True))           # array([5, 5, 5]: 값의 갯수 리턴
+print('y_train', y_train)                                           # [1 0 0 2 0 2 0 2 0 2 1 2 1 1 1]
+print('np.unique',np.unique(y_train, return_counts=True))           # array([5, 5, 5]: 값의 갯수 리턴
 
 #2. 모델
 model = Sequential()
@@ -88,20 +88,6 @@ model.fit(x_train, y_train, epochs=10, batch_size=4,
           )
 
 #####################accuracy_score를 사용해서 스코어를 빼세요###########################
-# 넘파이에서 0 or 1로 변환
-'''
-#4. 평가, 예측
-result = model.evaluate(x_test, y_test)
-print('result', result)
-
-y_predict = np.argmax(model.predict(x_test), axis=1)
-
-print('y_predict:', y_predict)
-
-acc = accuracy_score(y_test, y_predict)
-print('acc:', acc)
-'''
-
 #4. 평가, 예측
 results = model.evaluate(x_test, y_test)
 # print(results)

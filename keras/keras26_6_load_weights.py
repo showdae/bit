@@ -40,8 +40,8 @@ xtrains = scaler.fit_transform(x_train)                # 준비 / 변환을 한�
 x_test = scaler.transform(x_test)
 print('min/max: ',np.min(x_test), np.max(x_test))      # 0.0 1.0
 
-#2. 모델 구성                                 # 함수형 모델
-intput1 = Input(shape=(13,))                # 스칼렛 13개, 벡터 1개 (열의 형식을 적용)
+#2. 모델 구성                                           # 함수형 모델
+intput1 = Input(shape=(13,))                           # 스칼렛 13개, 벡터 1개 (열의 형식을 적용)
 dense1  = Dense(20, activation='sigmoid')(intput1)
 dense2  = Dense(50, activation='sigmoid')(dense1)
 dense3  = Dense(100, activation='sigmoid')(dense2)
@@ -52,7 +52,7 @@ dense7  = Dense(50, activation='relu')(dense6)
 dense8  = Dense(30, activation='relu')(dense7)
 output1  = Dense(1, activation='linear')(dense8)
 
-model = Model(inputs=intput1, outputs=output1)  # 함수 정의
+model = Model(inputs=intput1, outputs=output1)          # 함수 정의
 
 ############################ 스케일링 ############################
 # model.load_weights('./_save/keras26_5_save_weight1.h5')     # weight1: 초기 랜덤값의 웨이트 값만 저장되어 있다

@@ -27,20 +27,20 @@ test_csv = pd.read_csv(path + 'test.csv',
                         index_col = 0)
 
 ##################### 결측치 처리 ###########################
-print("train_csv.shape: ", train_csv.shape)
-print("train_csv.isnull(): ", train_csv.isnull())
-print("train_csv.isnull().sum(): ", train_csv.isnull().sum())
+# print("train_csv.shape: ", train_csv.shape)
+# print("train_csv.isnull(): ", train_csv.isnull())
+# print("train_csv.isnull().sum(): ", train_csv.isnull().sum())
 train_csv = train_csv.dropna()          # 결측치 제거
-print("train_csv.isnull().sum(): ", train_csv.isnull().sum())
+# print("train_csv.isnull().sum(): ", train_csv.isnull().sum())
 # print("train_csv.info(): ", train_csv.info())
-print("train_csv.shape: ", train_csv.shape)
+# print("train_csv.shape: ", train_csv.shape)
 
 ##################### train.csv 데이터에서 x와 y를 분리 ###########################
 x = train_csv.drop(['casual', 'registered', 'count'], axis= 1 )
-print("x.shape: ", x.shape)
+# print("x.shape: ", x.shape)
 
 y = train_csv['count']
-print("y.shape: ", y.shape)
+# print("y.shape: ", y.shape)
 
 x_train, x_test, y_train, y_test = train_test_split(
                                     x, y,
@@ -51,7 +51,7 @@ x_train, x_test, y_train, y_test = train_test_split(
 print("x_train.shape, x_test.shape", x_train.shape, x_test.shape)
 print("y_train.shape, y_test.shape", y_train.shape, y_test.shape)
 
-# 정규화 방법
+##################### 정규화 ###########################
 #1 train / test 분리 후에 정규화 한다
 #2 train 데이터만 먼저 정규화 해준다
 #3 train 데이터 비율 test 데이터를 정규화 해준다
@@ -83,7 +83,7 @@ model.add(Dense(30, activation='relu'))
 model.add(Dense(1, activation='linear'))
 '''
 
-#2.모델 구성                                        # 함수형 모델
+#2.모델 구성                                        # 함수형 모델!!! (다차원 사용시 많이 사용[이미지])
 intput1 = Input(shape=(8,))                        # 스칼렛 13개, 벡터 1개 (열의 형식을 적용)
 dense1  = Dense(20, activation='sigmoid')(intput1)
 dense2  = Dense(50, activation='sigmoid')(dense1)
@@ -95,7 +95,7 @@ dense7  = Dense(50, activation='relu')(dense6)
 dense8  = Dense(30, activation='relu')(dense7)
 output1  = Dense(1, activation='linear')(dense8)
 
-model = Model(inputs=intput1, outputs=output1)      # 함수 정의
+model = Model(inputs=intput1, outputs=output1)      # 함수 정의!!!
 
 #3. 컴파일 훈련
 model.compile(loss='mse',optimizer='adam')

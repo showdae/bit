@@ -5,13 +5,12 @@ import numpy as np
 from tensorflow.python.keras.callbacks import EarlyStopping
 from sklearn.metrics import r2_score
 import pandas as pd
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.metrics import accuracy_score
+from sklearn.preprocessing import MinMaxScaler 
 
 #1.데이터
 ##################### csv 로드 ###########################
-path = './_data/dacon_wine/'
-path_save = './_save/dacon_wine/'  
+path = './_data/kaggle_bike/'
+path_save = './_save/kaggle_bike/'  
 
 train_csv = pd.read_csv(path + 'train.csv',
                         index_col = 0)
@@ -29,18 +28,11 @@ train_csv = train_csv.dropna()          # 결측치 제거
 # print("train_csv.shape: ", train_csv.shape)
 
 ##################### train.csv 데이터에서 x와 y를 분리 ###########################
-x = train_csv.drop(['quality', 'type'], axis= 1 )
-print("x.shape: ", x.shape)         # (5497, 12)
+x = train_csv.drop(['casual', 'registered', 'count'], axis= 1 )
+# print("x.shape: ", x.shape)
 
-y = train_csv['quality']
-print("y.shape: ", y.shape)         # (5497,)
-
-##################### 원핫 인코딩 ###########################
-from tensorflow.keras.utils import to_categorical
-y = to_categorical(y)
-
-print("!!!", y.shape)               # (5497, 10)
-print('==============================')
+y = train_csv['count']
+# print("y.shape: ", y.shape)
 
 x_train, x_test, y_train, y_test = train_test_split(
                                     x, y,
@@ -48,9 +40,8 @@ x_train, x_test, y_train, y_test = train_test_split(
                                     train_size=0.7,
                                     random_state=111
 )
-print("x_train.shape, x_test.shape", x_train.shape, x_test.shape)       # (3847, 12) (1650, 12)
-print("y_train.shape, y_test.shape", y_train.shape, y_test.shape)       # (3847,) (1650,)
-
+print("x_train.shape, x_test.shape", x_train.shape, x_test.shape)
+print("y_train.shape, y_test.shape", y_train.shape, y_test.shape)
 
 scaler = MinMaxScaler()
 # scaler = StandardScaler()                 # StandardScaler 사용법
@@ -63,11 +54,10 @@ test_csv = scaler.transform(test_csv)       # 변환 (test_csv)
 print('min/max: ',np.min(x_test), np.max(x_test))
 
 
-
 #2.모델 구성                                        # 함수형 모델!!! (다차원 사용시 많이 사용[이미지])
-intput1 = Input(shape=(11,))
-dense1  = Dense(20, activation='relu')(intput1)
-dense2  = Dense(50, activation='relu')(dense1)
+intput1 = Input(shape=(8,))
+dense1  = Dense(20, activation='sigmoid')(intput1)
+dense2  = Dense(50, activation='sigmoid')(dense1)
 drop1 = Dropout(0.3)(dense2)
 dense3  = Dense(100, activation='relu')(drop1)
 drop2 = Dropout(0.3)(dense3)
@@ -80,54 +70,22 @@ drop5 = Dropout(0.3)(dense6)
 dense7  = Dense(50, activation='relu')(drop5)
 drop6 = Dropout(0.3)(dense7)
 dense8  = Dense(30, activation='relu')(drop6)
-output1  = Dense(10, activation='softmax')(dense8)
+output1  = Dense(1, activation='linear')(dense8)
 
 model = Model(inputs=intput1, outputs=output1)      # 함수 정의!!!
 
-#3. 컴파일, 훈련
-model.compile(loss='categorical_crossentropy', optimizer='adam',    # adam: 평타 이상의 성능
-              metrics=['acc'])
-
-model.fit(x_train, y_train, epochs=10, batch_size=4,
-          validation_split=0.2,
-          verbose=1,
-          )
-
-#####################accuracy_score를 사용해서 스코어를 빼세요###########################
-#4. 평가, 예측
-results = model.evaluate(x_test, y_test)
-# print(results)
-print('loss: ', results[0])
-print('acc: ',  results[1])             # metrics=['acc']
-
-y_pred = model.predict(x_test)
-
-print(y_test.shape)                 # (30, 3) 원핫이 되어 있음
-print(y_test[:5])
-print(y_pred.shape)                 # (30, 3) 원핫이 되어 있음
-print(y_pred[:5])
-
-y_test_acc = np.argmax(y_test, axis=1)  # axis=1: 각 행에 있는 열끼리 비교
-y_pred = np.argmax(y_pred, axis=1)      # axis=1: 각 행에 있는 열끼리 비교
-
-acc = accuracy_score(y_test_acc, y_pred)
-print('accuracy_score: ', acc)
-
 #3. 컴파일 훈련
-model.compile(loss='categorical_crossentropy',optimizer='adam')
+model.compile(loss='mse',optimizer='adam')
 
 from tensorflow.python.keras.callbacks import EarlyStopping
 
 # EarlyStopping: 최소의 로스 지점을 찿을 수 있다
-# es = EarlyStopping(monitor='val_loss', patience=30, mode='min', verbose=1,
-#                    restore_best_weights=True
-#                    )
+es = EarlyStopping(monitor='val_loss', patience=30, mode='min', verbose=1,
+                   restore_best_weights=True
+                   )
 
-model.fit(x_train, y_train, epochs=10, batch_size=12, 
-                                                    # validation_split=0.2, 
-                                                    # verbose=1,
-                                                    # callbacks=[es]
-                                                    )
+model.fit(x_train, y_train, epochs=100, batch_size=24, validation_split=0.2, verbose=1,
+                 callbacks=[es])
 
 # model.fit의 반환값
 # print("======================================")

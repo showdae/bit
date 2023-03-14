@@ -1,0 +1,128 @@
+import numpy as np
+import pandas as pd
+from tensorflow.python.keras.models import Sequential, Model
+from tensorflow.python.keras.layers import Dense, Dropout, Input,LeakyReLU
+from sklearn.metrics import accuracy_score
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import MinMaxScaler,MaxAbsScaler
+from sklearn.preprocessing import StandardScaler,RobustScaler
+from sklearn.preprocessing import OneHotEncoder
+from tensorflow.python.keras.callbacks import EarlyStopping
+
+
+#1. 데이터
+##### csv 로드 #####
+path = './_data/dacon_wine/'
+path_save = './_save/dacon_wine/'
+
+train_csv = pd.read_csv(path + 'train.csv', index_col= 0)
+test_csv = pd.read_csv(path + 'test.csv', index_col= 0)
+
+print('train_csv.shape',train_csv.shape)                # train_csv.shape (5497, 13)
+print('test_csv.shape',test_csv.shape)                  # test_csv.shape (1000, 12)
+
+##### 결측치 제거 #####
+print('결측치',train_csv.isnull().sum())                 # 결측치 quality 0 (없음)
+
+##### train 데이터 -> x, y drop #####
+x = train_csv.drop(['quality','type'], axis= 1)         # quality, type 빼고 추출 (type: 아직 안배움)
+y = train_csv['quality']                                # quality만 추출
+test_csv = test_csv.drop(['type'],axis = 1)             # (type: 아직 안배움)
+print('x.shape',x.shape)                                # x.shape (5497, 11) - quality, type 제거 [input]
+print('y.shape',y.shape)                                # y.shape (5497,) - quality만 [output]
+
+##### csv 출력값 리턴 #####
+print('unique',np.unique(y))                            # unique [3 4 5 6 7 8 9] - train csv 파일 quality값 종류 리턴
+
+##### 원핫 인코딩 #####
+# 원핫 인코딩: 표현하고 싶은 단어의 인덱스에 1의 값을 부여하고,
+#             다른 인덱스에는 0을 부여하는 벡터 표현 방식
+#             가치에 대해서 평가를 못하게 하기 위해서 사용
+ohe = OneHotEncoder()                                   # 사이킷런 원핫 인코딩
+print('type(y)1',type(y))                               # <class 'pandas.core.series.Series'>
+y = train_csv['quality'].values                         # pandas -> numpy 형변환
+print('type(y)2',type(y))                               # <class 'numpy.ndarray'>
+y = y.reshape(-1,1)                                     # 2차원으로 변함 ???
+y = ohe.fit_transform(y).toarray()
+
+##### x, y -> train, test 분리 #####
+x_train, x_test, y_train, y_test = train_test_split(
+    x, y, shuffle= True, random_state= 1742, train_size= 0.7, stratify=y)            # stratify: y를 골고루 학습
+
+##### scaler #####
+# 정규화
+# MinMaxScaler: 최대값을 최대값으로 나누어 0~1 사이로 만든다
+scaler = MinMaxScaler()
+x_train = scaler.fit_transform(x_train)                                             # fit: 준비, transform: 변환
+x_test = scaler.transform(x_test)
+test_csv = scaler.transform(test_csv)
+
+
+#2.모델 구성 (함수형)
+input1 = Input(shape = (11,))
+dense1 = Dense(128)(input1)
+drop1 = Dropout(0.25)(dense1)
+dense2 = Dense(64, activation= LeakyReLU(0.85))(drop1)                              # 활성화함수: LeakyReLU - 아직 안배움
+dense3 = Dense(32)(dense2)
+drop2 = Dropout(0.25)(dense3)
+dense4 = Dense(64, activation= LeakyReLU(0.85))(drop2)
+drop3 = Dropout(0.25)(dense4)
+dense5 = Dense(64, activation= LeakyReLU(0.85))(drop3)
+dense6 = Dense(64, activation= LeakyReLU(0.85))(dense5)
+drop4 = Dropout(0.25)(dense5)
+output1 = Dense(7, activation= 'softmax')(drop4)                                    # softmax: 다중 분류
+model = Model(inputs = input1, outputs = output1)                                   # 함수 정의
+
+
+#3.컴파일
+# EarlyStopping: patience 만큼 반복하여, min 값과 비교 후 중단
+# mode: auto or min or max
+# restore_best_weights: 브레이크 잡은 시점에서 최적의 W 값 저장, 디폴트: 0
+es = EarlyStopping(monitor= 'val_acc', patience= 100, mode = 'max',
+                   restore_best_weights= True,                      # restore_best_weights: 브레이크 잡은 시점에서 최적의 W 값 저장, 디폴트: 0
+                   verbose= 1)
+
+model.compile(loss = 'categorical_crossentropy',                    # categorical_crossentropy: 다중 분류
+              optimizer = 'adam',
+              metrics = ['acc'])                                    # metrics: 훈련시 accuracy 적용, mse 출력 추가 (훈련에 영향을 미치지 않음)
+
+model.fit(x_train, y_train, epochs = 10, 
+          batch_size = 55, verbose = 1,
+          validation_split= 0.2,                                    # validation_split: 훈련시 모의모사 검증
+          callbacks = [es])
+
+
+#4. 평가, 예측
+results = model.evaluate(x_test,y_test)
+print('loss :', results[0])                                         # loss : 1.0997968912124634
+print('acc :', results[1])                                          # acc : 0.5400000214576721
+
+y_predict = model.predict(x_test)
+
+# argmax: 벡터중 가장 높은 값을 리턴 한다
+# axis = 0 = 행(row)
+# axis = 1 = 열(col)
+# axis = -1 = 가장 마지막 축, 이건 2차원이니까 가장 마지막축은 1
+# 그래서 -1을 쓰면 이 데이터는 1과 동일 
+# print(np.argmax(a, axis=0))     # [2 2 1]: 행에서 가장 높은값 리턴
+# print(np.argmax(a, axis=1))     # [2 0 1 0 1]: 열에서 가장 높은값 리턴
+# print(np.argmax(a, axis=-1))    # [2 0 1 0 1]: 가장 마지막 축, 이건 2차원이니까 가장 마지막축은 1
+
+y_test_acc = np.argmax(y_test, axis =-1)                            # argmax: 벡터중 가장 높은 값을 리턴 한다
+y_predict = np.argmax(y_predict, axis =-1)
+print('y_predict',y_predict)                                        # y_predict [2 2 3 ... 2 3 2]
+
+acc = accuracy_score(y_test_acc, y_predict)
+print('Accuary score : ', acc)                                      # Accuary score :  0.5284848484848484
+
+
+#5. 파일저장
+y_submit = model.predict(test_csv)
+
+y_submit = np.argmax(y_submit, axis = 1)
+
+submission = pd.read_csv(path + 'submission.csv', index_col = 0)
+y_submit += 3                                                       # ???
+submission['quality'] = y_submit
+print('unique',np.unique(y_submit))                                 # unique [5 6 7]
+submission.to_csv(path_save + 'dacon_wine_submit.csv')

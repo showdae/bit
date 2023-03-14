@@ -78,7 +78,7 @@ es = EarlyStopping(monitor='val_loss', patience=20, mode='min', verbose=1,  # Ea
                    restore_best_weights=True                                # restore_best_weights: 브레이크 잡은 시점에서 최적의 W 값 저장, 디폴트: 0
                    )
 
-hist = model.fit(x_train, y_train, epochs=10, batch_size=13, validation_split=0.2, verbose=1,  # validation_split: 훈련시 모의모사 검증
+hist = model.fit(x_train, y_train, epochs=100, batch_size=13, validation_split=0.2, verbose=1,  # validation_split: 훈련시 모의모사 검증
                  callbacks=[es])                                            # EarlyStopping 함수 호출
 
 
@@ -100,10 +100,11 @@ print("loss: ", loss)
 
 y_predict = model.predict(x_test)
 
-r2 = r2_score(y_predict, y_test)
+r2 = r2_score(y_test, y_predict)
 print("r2: ", r2)
 
 
+'''
 #5. 그래프 출력
 # 과적합 그래프 모양 체크
 # 한글 타이틀은 깨짐
@@ -120,3 +121,4 @@ plt.ylabel('로스, 발로스')
 plt.legend()
 plt.grid()
 plt.show()
+'''

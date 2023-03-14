@@ -43,10 +43,10 @@ print("train_csv.shape: ", train_csv.shape)         # (652, 9)
 ##################### train.csv 데이터에서 x와 y를 분리 ###########################
 
 x = train_csv.drop(['Outcome'], axis= 1 )
-print("x.shape: ", x.shape)                         # (652, 8)
+# print("x.shape: ", x.shape)                         # (652, 8)
 
 y = train_csv['Outcome']
-print("y.shape: ", y.shape)                         # (652,)
+# print("y.shape: ", y.shape)                         # (652,)
 
 
 x_train, x_test, y_train, y_test = train_test_split(
@@ -56,7 +56,7 @@ x_train, x_test, y_train, y_test = train_test_split(
                                 random_state = 1333
 )
 
-# 정규화 방법
+##################### 정규화 ###########################
 #1 train / test 분리 후에 정규화 한다
 #2 train 데이터만 먼저 정규화 해준다
 #3 train 데이터 비율 test 데이터를 정규화 해준다
@@ -92,7 +92,7 @@ model.add(Dense(20, activation='relu'))
 model.add(Dense(1, activation='sigmoid'))
 '''
 
-#2.모델 구성                                    # 함수형 모델
+#2.모델 구성                                    # 함수형 모델!!! (다차원 사용시 많이 사용[이미지])
 intput1 = Input(shape=(8,))                    # 스칼렛 13개, 벡터 1개 (열의 형식을 적용)
 dense1  = Dense(10, activation='linear')(intput1)
 dense2  = Dense(20,activation='relu')(dense1)
@@ -108,7 +108,7 @@ dense11  = Dense(50,activation='relu')(dense10)
 dense12  = Dense(20,activation='relu')(dense11)
 output1  = Dense(1, activation='sigmoid')(dense12)
 
-model = Model(inputs=intput1, outputs=output1)  # 함수 정의
+model = Model(inputs=intput1, outputs=output1)  # 함수 정의!!!
 
 #3. 컴파일, 훈련
 model.compile(loss='binary_crossentropy', optimizer='adam',
